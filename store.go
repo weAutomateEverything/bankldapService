@@ -9,6 +9,7 @@ type Store interface {
 	storeNewToken(userid string, employeeNumber string, email string, token string)
 	getTokenForUser(userid string) (string, error)
 	authorizeUser(userid string) error
+	isAuthorized(userid string) bool
 }
 
 type user struct {
@@ -25,6 +26,17 @@ type mongoDb struct {
 
 func NewMongoStore(db *mgo.Database)  Store {
 	return &mongoDb{db:db}
+}
+
+func (s mongoDb) isAuthorized(userid string) bool {
+	c:= s.db.C("BANK_USERS")
+	u := &user{}
+	err := c.Find(bson.M{"telegramid":userid}).One(&u)
+	if err != nil {
+		return false
+	}
+
+	return u.Authorised
 }
 
 func (s mongoDb)storeNewToken(userid string, employeeNumber string, email string, token string){
@@ -61,3 +73,4 @@ func (s mongoDb)authorizeUser(userid string) error{
 	c.Update(bson.M{"telegramid":userid},&u)
 	return nil
 }
+

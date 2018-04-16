@@ -25,6 +25,10 @@ func NewRegisterCommand(service telegram.Service, store Store) telegram.Command 
 	return &register{service: service, store: store}
 }
 
+func (s *register) RestrictToAuthorised() bool {
+	return false
+}
+
 func (*register) CommandIdentifier() string {
 	return "Register"
 }
@@ -132,6 +136,10 @@ type token struct {
 
 func NewTokenCommand(service telegram.Service, store Store) telegram.Command {
 	return &token{service, store}
+}
+
+func (s token) RestrictToAuthorised() bool {
+	return false
 }
 
 func (token) CommandIdentifier() string {
